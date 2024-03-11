@@ -1,13 +1,18 @@
 import streamlit as st
 import pandas as pd
+import os
 
 # Function to load menu from Excel file
 def load_menu():
-    try:
-        menu_df = pd.read_excel('menu.xlsx')
-    except FileNotFoundError:
-        menu_df = pd.DataFrame(columns=['Day', 'Menu'])
+    if not os.path.exists('menu.xlsx'):
+        create_empty_menu()
+    menu_df = pd.read_excel('menu.xlsx')
     return menu_df
+
+# Function to create an empty menu Excel file
+def create_empty_menu():
+    df = pd.DataFrame(columns=['Day', 'Breakfast', 'Lunch', 'Dinner'])
+    df.to_excel('menu.xlsx', index=False)
 
 # Function to save menu to Excel file
 def save_menu(menu_df):
@@ -29,9 +34,11 @@ def manager_page():
     # Option to add new item to menu
     st.header("Add Item to Menu")
     new_day = st.text_input("Day:")
-    new_menu = st.text_input("Menu:")
+    new_breakfast = st.text_input("Breakfast:")
+    new_lunch = st.text_input("Lunch:")
+    new_dinner = st.text_input("Dinner:")
     if st.button("Add"):
-        menu_df = menu_df.append({'Day': new_day, 'Menu': new_menu}, ignore_index=True)
+        menu_df = menu_df.append({'Day': new_day, 'Breakfast': new_breakfast, 'Lunch': new_lunch, 'Dinner': new_dinner}, ignore_index=True)
         save_menu(menu_df)
         st.success("Item added successfully!")
 
@@ -47,10 +54,14 @@ def manager_page():
     st.header("Update Item in Menu")
     update_index = st.selectbox("Select index to update:", menu_df.index)
     new_day = st.text_input("Day:", value=menu_df.loc[update_index, 'Day'])
-    new_menu = st.text_input("Menu:", value=menu_df.loc[update_index, 'Menu'])
+    new_breakfast = st.text_input("Breakfast:", value=menu_df.loc[update_index, 'Breakfast'])
+    new_lunch = st.text_input("Lunch:", value=menu_df.loc[update_index, 'Lunch'])
+    new_dinner = st.text_input("Dinner:", value=menu_df.loc[update_index, 'Dinner'])
     if st.button("Update"):
         menu_df.loc[update_index, 'Day'] = new_day
-        menu_df.loc[update_index, 'Menu'] = new_menu
+        menu_df.loc[update_index, 'Breakfast'] = new_breakfast
+        menu_df.loc[update_index, 'Lunch'] = new_lunch
+        menu_df.loc[update_index, 'Dinner'] = new_dinner
         save_menu(menu_df)
         st.success("Item updated successfully!")
 
